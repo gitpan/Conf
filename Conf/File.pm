@@ -152,7 +152,7 @@ __END__
 
 =head1 Name
 
-Conf::File - The file backend for Conf.
+Conf::File, a file backend for Conf.
 
 =head1 Abstract
 

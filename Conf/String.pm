@@ -90,7 +90,7 @@ __END__
 
 =head1 Name
 
-Conf::String - String backend for Conf.
+Conf::String, a string backend for Conf.
 
 =head1 Synopsys
 
