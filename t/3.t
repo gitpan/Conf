@@ -92,7 +92,7 @@ $conf->set("oesterhol","account");
 
 ok($conf->get("oesterhol") eq "account", "initial comments conf in \$string -> account");
 
-
+undef $conf;
 # With comments reread
 
 my $nconf=new Conf(new Conf::File("conf.t.3b.cfg"));
@@ -107,6 +107,7 @@ $nconf->set("oesterhol","nil");
 
 # Reread again now
 
+undef $nconf;
 my $nconf=new Conf(new Conf::File("conf.t.3b.cfg"));
 
 ok($nconf->get("test") eq "HI=Yes", "reread comments conf in \$string -> test=HI=Yes");
@@ -144,7 +145,8 @@ ok((not defined $nconf->get("oesterhol")),"variables -> deleted not there");
 
 # Reread again now
 
-my $nconf=new Conf(new Conf::File("conf.t.3b.cfg"));
+undef $nconf;
+$nconf=new Conf(new Conf::File("conf.t.3b.cfg"));
 
 undef %e;
 my %e;
@@ -175,8 +177,8 @@ ok((not defined $nconf->get("oesterhol")),"reread comments conf in \$string -> o
 # Unlink conf files
 
 END { 
-#	unlink("conf.t.3.cfg");
-#	unlink("conf.t.3a.cfg");
-#	unlink("conf.t.3b.cfg");
+	unlink("conf.t.3.cfg");
+	unlink("conf.t.3a.cfg");
+	unlink("conf.t.3b.cfg");
 }
 
