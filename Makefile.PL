@@ -9,6 +9,5 @@ WriteMakefile(
     'PREREQ_PM'		=> { },
     'ABSTRACT_FROM'     => 'Conf.pm',
     'AUTHOR'            => 'Hans Oesterholt-Dijkema <oesterhol@cpan.org>',
-    'test'             => { 'TESTS' => $TESTS },
 );
 

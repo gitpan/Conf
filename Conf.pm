@@ -3,7 +3,7 @@ package Conf;
 use 5.006;
 use strict;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub new {
   my $class=shift;
