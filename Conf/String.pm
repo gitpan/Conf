@@ -80,6 +80,12 @@ sub get {
   return $self->{"cfg"}->{$var};
 }
 
+sub del {
+  my ($self,$var)=@_;
+  delete $self->{"cfg"}->{$var};
+  $self->commit();
+}
+
 sub variables {
   my $self=shift;
 return keys %{$self->{"cfg"}};

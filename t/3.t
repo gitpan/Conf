@@ -5,7 +5,7 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 30;
+use Test::More tests => 41;
 BEGIN { 
 	use_ok('Conf');
 	use_ok('Conf::File');
@@ -115,11 +115,68 @@ ok($nconf->get("test2") eq "%joep%", "reread comments conf in \$string -> test2=
 ok($nconf->get("test3") eq "ok\n%Hello", "reread comments conf in \$string -> test3=ok");
 ok($nconf->get("oesterhol") eq "nil","reread comments conf in \$string -> oesterhol=nil");
 
+### Delete 2 variables
+
+$nconf->del("test1");
+$nconf->del("oesterhol");
+
+### Look up all variables
+
+undef %e;
+my %e;
+$e{"test"}=0;
+$e{"test2"}=0;
+$e{"test3"}=0;
+
+my @vars=$nconf->variables();
+for my $var (@vars) {
+	$e{$var}+=1;
+}
+
+my $all=1;
+for my $k (keys %e) {
+	if ($e{$k}==0) { $all=0; }
+}
+
+ok($all==1,"variables: --> all variables are there");
+ok((not defined $nconf->get("test1")),"variables -> deleted not there");
+ok((not defined $nconf->get("oesterhol")),"variables -> deleted not there");
+
+# Reread again now
+
+my $nconf=new Conf(new Conf::File("conf.t.3b.cfg"));
+
+undef %e;
+my %e;
+$e{"test"}=0;
+$e{"test2"}=0;
+$e{"test3"}=0;
+
+my @vars=$nconf->variables();
+for my $var (@vars) {
+	$e{$var}+=1;
+}
+
+my $all=1;
+for my $k (keys %e) {
+	if ($e{$k}==0) { $all=0; }
+}
+
+ok($all==1,"variables: --> all variables are there");
+ok((not defined $nconf->get("test1")),"variables -> deleted not there");
+ok((not defined $nconf->get("oesterhol")),"variables -> deleted not there");
+
+ok($nconf->get("test") eq "HI=Yes", "reread comments conf in \$string -> test=HI=Yes");
+ok((not defined $nconf->get("test1")), "reread comments conf in \$string -> test1 deleted!");
+ok($nconf->get("test2") eq "%joep%", "reread comments conf in \$string -> test2=%joep%");
+ok($nconf->get("test3") eq "ok\n%Hello", "reread comments conf in \$string -> test3=ok");
+ok((not defined $nconf->get("oesterhol")),"reread comments conf in \$string -> oesterhol deleted");
+
 # Unlink conf files
 
 END { 
-	unlink("conf.t.3.cfg");
-	unlink("conf.t.3a.cfg");
-	unlink("conf.t.3b.cfg");
+#	unlink("conf.t.3.cfg");
+#	unlink("conf.t.3a.cfg");
+#	unlink("conf.t.3b.cfg");
 }
 

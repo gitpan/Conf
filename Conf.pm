@@ -3,7 +3,7 @@ package Conf;
 use 5.006;
 use strict;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub new {
   my $class=shift;
@@ -17,17 +17,18 @@ return $self;
 }
 
 sub set {
-  my $self=shift;
-  my $var=shift;
-  my $val=shift;
-
+  my ($self,$var,$val)=@_;
   $self->{"backend"}->set($var,$val);
 }
 
 sub get {
-  my $self=shift;
-  my $var=shift;
+  my ($self,$var)=@_;
 return $self->{"backend"}->get($var);
+}
+
+sub del {
+  my ($self,$var)=@_;
+  $self->{"backend"}->del($var);
 }
 
 sub variables {
@@ -56,6 +57,10 @@ Conf - Configuration module with flexible backends
  print $cfg->get("config item 1");
  $cfg->set("config item 1","Hi There!");
 
+ $cfg->set("cfg2","config 2");
+
+ $cfg->del("config item 1");
+
  open my $out,">conf.cfg";
  print $out $string;
  close $out;
@@ -78,9 +83,14 @@ Returns a C<Conf> object.
 
 Sets a variable with value val in the backend.
 
-=head2 C<get(var) --E<gt> void>
+=head2 C<get(var) --E<gt> string>
 
 Returns the value for var as stored in the backend.
+Returns C<undef>, if var does not exist in the backend.
+
+=head2 C<del(var) --E<gt> void>
+
+Deletes a variable from the backend.
 
 =head2 C<variables() --E<gt> list of stored variables>
 
@@ -88,7 +98,8 @@ Returns a list all variables stored in the backen.
 
 =head1 SEE ALSO
 
-L<Conf::String | Conf::String>, L<Conf::SQL | Conf::SQL>, L<Conf::File | Conf::File>.
+L<Conf::String | Conf::String>, L<Conf::SQL | Conf::SQL>, L<Conf::File | Conf::File>,
+L<Conf::INI>.
 
 =head1 AUTHOR
 

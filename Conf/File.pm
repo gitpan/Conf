@@ -142,6 +142,24 @@ sub get {
 return $self->{"conf"}->{$var};
 }
 
+sub del {
+  my ($self,$var)=@_;
+
+  $self->{"changed"}=1;
+
+  delete $self->{"conf"}->{$var};
+
+  my @neworder;
+  for my $elem (@{$self->{"order"}}) {
+    if ($elem ne $var) {
+      push @neworder,$elem;
+    }
+  }
+  $self->{"order"}=\@neworder;
+
+  $self->commit();
+}
+
 sub variables {
   my $self=shift;
 return keys %{$self->{"conf"}};
@@ -208,6 +226,10 @@ away.
 Reads var from config. Returns C<undef>, if var does not
 exist. Returns the value of configuration item C<var>,
 otherwise.
+
+=head2 C<del(var) --E<gt> void>
+
+Deletes var from the configuration file.
 
 =head2 C<variables() --E<gt> list of strings>
 
