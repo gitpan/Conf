@@ -237,7 +237,8 @@ Returns all variables in the configuraton file.
 
 =head1 SEE ALSO
 
-L<Conf::String | Conf::String>, L<Conf::SQL | Conf::SQL>, L<Conf::File | Conf::File>.
+L<Conf::String|Conf::String>, L<Conf::SQL|Conf::SQL>, L<Conf::File|Conf::File>,
+L<Conf|Conf>.
 
 =head1 AUTHOR
 

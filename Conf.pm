@@ -3,7 +3,7 @@ package Conf;
 use 5.006;
 use strict;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 sub new {
   my $class=shift;
@@ -98,8 +98,8 @@ Returns a list all variables stored in the backen.
 
 =head1 SEE ALSO
 
-L<Conf::String | Conf::String>, L<Conf::SQL | Conf::SQL>, L<Conf::File | Conf::File>,
-L<Conf::INI>.
+L<Conf::String|Conf::String>, L<Conf::SQL|Conf::SQL>, L<Conf::File|Conf::File>,
+L<Conf::INI|Conf::INI>.
 
 =head1 AUTHOR
 

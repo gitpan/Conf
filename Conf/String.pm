@@ -130,8 +130,8 @@ Otherwise will attempt to die.
 =head2 C<set(var,val) --E<gt> void>
 
 This method will set variable C<var> to value <val>. All set methods will
-immmidiately reset the value of the string that the object references to.
-So, all changes through 'set' will be visibile immidiately to the 
+immediately reset the value of the string that the object references to.
+So, all changes through 'set' will be visibile imediately to the 
 program environment.
 
 =head2 C<get(var) --E<gt> string>
@@ -139,13 +139,18 @@ program environment.
 Returns C<undef>, if var does not exist.
 Returns the value of var (string), otherwise.
 
+=head2 C<del(var) --E<gt> void>
+
+Delets var from the string.
+
 =head2 C<variables() --E<gt> list>
 
 Will return a list of all variables in Conf::String.
 
 =head1 SEE ALSO
 
-L<Conf::String | Conf::String>, L<Conf::SQL | Conf::SQL>, L<Conf::File | Conf::File>.
+L<Conf::String|Conf::String>, L<Conf::SQL|Conf::SQL>, L<Conf::File|Conf::File>,
+L<Conf|Conf>.
 
 =head1 AUTHOR
 
