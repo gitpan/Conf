@@ -147,7 +147,7 @@ __END__
 
 =head1 Name
 
-Conf::SQL - The file backend for Conf.
+Conf::SQL - The SQL backend for Conf.
 
 =head1 Abstract
 

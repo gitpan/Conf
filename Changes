@@ -1,5 +1,8 @@
 Revision history for Perl extension Conf.
 
+0.03 Documentation: Conf::SQL was named Conf::SQL - the *file* backend...
+	is now Conf::SQL - the SQL backend...
+
 0.02 Changed the interface for Conf::SQL.
 
 0.01  Mon Mar 29 14:36:50 2004
