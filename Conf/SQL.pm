@@ -6,19 +6,29 @@ use DBI;
 
 sub new {
   my $class=shift;
-  my $dsn=shift;
-  my $user=shift;
-  my $pass=shift;
+  my $args={
+	    DSN => undef,
+	    DBUSER => undef,
+	    DBPASS => undef,
+	    TABLE => "conf_table",
+	    @_
+	    };
+
+  my $dsn=$args->{"DSN"} or die "You need to specify a valid DSN for Conf::SQL";
+  my $user=$args->{"DBUSER"} or die "You need to specify a valid DB User for Conf::SQL";
+  my $pass=$args->{"DBPASS"};
+  my $table=$args->{"TABLE"} or die "You need to specify a valid tablename for Conf::SQL";
   my $self;
 
   # Read in config
 
   $self->{"dbh"}=DBI->connect($dsn,$user,$pass);
+  $self->{"TABLE"}=$table;
   $self->{"dbh"}->{"PrintError"}=0;
 
   # Table exists?
 
-  my $sth=$self->{"dbh"}->prepare("SELECT COUNT(var) FROM conf_table");
+  my $sth=$self->{"dbh"}->prepare("SELECT COUNT(var) FROM $table");
   $sth->execute();
   if ($sth->rows() lt 0) {
     $sth->finish();
@@ -27,20 +37,20 @@ sub new {
     my $driver=lc($dbh->{Driver}->{Name});
 
     if ($driver eq "pg") { # PostgreSQL
-      $dbh->do("CREATE TABLE conf_table(uid varchar,var varchar,value varchar)");
-      $dbh->do("CREATE INDEX conf_table_idx ON conf_table(uid, var)");
+      $dbh->do("CREATE TABLE $table(uid varchar,var varchar,value varchar)");
+      $dbh->do("CREATE INDEX $table"."_idx ON $table(uid, var)");
     }
     elsif ($driver eq "mysql") { # mysql
-      $dbh->do("CREATE TABLE conf_table(uid varchar(250),var varchar(250),value mediumtext)");
-      $dbh->do("CREATE INDEX conf_table_idx ON conf_table(uid, var)");
+      $dbh->do("CREATE TABLE $table(uid varchar(250),var varchar(250),value mediumtext)");
+      $dbh->do("CREATE INDEX $table"."_idx ON $table(uid, var)");
     }
     elsif ($driver eq "sqlite") { # sqlite
-      $dbh->do("CREATE TABLE conf_table(uid varchar(250),var varchar(1024),value text)");
-      $dbh->do("CREATE INDEX conf_table_idx ON conf_table(uid, var)");
+      $dbh->do("CREATE TABLE $table(uid varchar(250),var varchar(1024),value text)");
+      $dbh->do("CREATE INDEX $table"."_idx ON $table(uid, var)");
     }
     else {
-      die "Cannot create table CREATE TABLE conf_table(uid varchar(250),var varchar(1024),value text)\n".
-          "and index           CREATE INDEX conf_table_idx ON conf_table(uid, var)\n".
+      die "Cannot create table CREATE TABLE $table(uid varchar(250),var varchar(1024),value text)\n".
+          "and index           CREATE INDEX $table"."_idx ON $table(uid, var)\n".
 	  "I don't know this database system '$driver'";
     }
   }
@@ -73,19 +83,20 @@ sub set {
 
   my $user=$self->{"user"};
   my $dbh=$self->{"dbh"};
+  my $table=$self->{"TABLE"};
 
   # Update or insert?
 
-  my $sth=$dbh->prepare("SELECT COUNT(var) FROM conf_table WHERE uid='$user' AND var='$var'");
+  my $sth=$dbh->prepare("SELECT COUNT(var) FROM $table WHERE uid='$user' AND var='$var'");
   $sth->execute();
   my ($count)=$sth->fetchrow_array();
   $sth->finish();
 
   if ($count==0) {
-    $dbh->do("INSERT INTO conf_table (var,uid,value) VALUES (".$dbh->quote($var).",".$dbh->quote($user).",".$dbh->quote($val).")");
+    $dbh->do("INSERT INTO $table (var,uid,value) VALUES (".$dbh->quote($var).",".$dbh->quote($user).",".$dbh->quote($val).")");
   }
   else {
-    $dbh->do("UPDATE conf_table SET value=".$dbh->quote($val)." WHERE uid=".$dbh->quote($user)." AND var=".$dbh->quote($var));
+    $dbh->do("UPDATE $table SET value=".$dbh->quote($val)." WHERE uid=".$dbh->quote($user)." AND var=".$dbh->quote($var));
   }
 }
 
@@ -95,11 +106,12 @@ sub get {
 
   my $user=$self->{"user"};
   my $dbh=$self->{"dbh"};
+  my $table=$self->{"TABLE"};
   
   # get
 
   my $val=undef;
-  my $sth=$dbh->prepare("SELECT value FROM conf_table WHERE uid=".$dbh->quote($user)." AND var=".$dbh->quote($var));
+  my $sth=$dbh->prepare("SELECT value FROM $table WHERE uid=".$dbh->quote($user)." AND var=".$dbh->quote($var));
   $sth->execute();
   if ($sth->rows()!=0) {
     ($val)=$sth->fetchrow_array();
@@ -114,11 +126,12 @@ sub variables {
 
   my $user=$self->{"user"};
   my $dbh=$self->{"dbh"};
+  my $table=$self->{"TABLE"};
 
   # get variables
 
   my @vars;
-  my $sth=$dbh->prepare("SELECT var FROM conf_table WHERE uid='$user'");
+  my $sth=$dbh->prepare("SELECT var FROM $table WHERE uid='$user'");
   $sth->execute();
   for (1..$sth->rows()) {
     my ($var)=$sth->fetchrow_array();
@@ -139,7 +152,7 @@ Conf::SQL - The file backend for Conf.
 =head1 Abstract
 
 C<Conf::SQL> is an SQL  backend for Conf. It handles
-a table C<conf_table> with identifiers that are 
+a table C<$table> with identifiers that are 
 assigned values. The identifiers are specified on
 a per user basis. C<Conf::SQL> tries to get the user
 account of the user self.
@@ -155,22 +168,24 @@ C<perl Makefile.PL --no-sql>.
 Each call C<set()> will immediately result in a commit 
 to the database.
 
-=head2 C<new(DSN,USER,PASS)> --E<gt> Conf::SQL
+=head2 C<new(DSN => ...,DBUSER => ..., DBPASS =>, [TABLE => ...])> --E<gt> Conf::SQL
 
-Invoked with a valid C<DSN>, C<USER> and C<PASS> combination,
+Invoked with a valid C<DSN>, C<DBUSER> and C<DBPASS> combination,
 will return a Conf::SQL object that is connected to
 the database. 
 
-This function will try to create a C<conf_table>
+TABLE defaults to C<conf_table>.
+
+This function will try to create a C<TABLE>
 table in the given C<DSN>, if it does not exist.
 
-=head3 Creating the table conf_table in your database
+=head3 Creating the table $table in your database
 
 If it cannot create a table for you, because it doesn't know
 the database you are using, you can create your own. 
 The table used has following form:
 
-  CREATE TABLE conf_table(uid varchar,var varchar,value varchar)
+  CREATE TABLE $table(uid varchar,var varchar,value varchar)
 
 The form presented here is a C<PostgreSQL> form. You will want
 at least following specifications for uid, var and value:
@@ -179,9 +194,9 @@ at least following specifications for uid, var and value:
    var    varchar(250)
    value  text, bigtext, mediumtext, varchar(1000000000), etc.
 
-You may also want an index on conf_table, like this one:
+You may also want an index on $table, like this one:
 
-   CREATE INDEX conf_table_idx ON conf_table(uid, var)
+   "CREATE INDEX $table"."_idx ON $table(uid, var)"
 
 =head2 DESTROY()
 

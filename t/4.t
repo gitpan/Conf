@@ -21,17 +21,14 @@ BEGIN {
 my $DSN=$ENV{"DSN"};
 my $DBUSER=$ENV{"DBUSER"};
 my $PASS=$ENV{"DBPASS"};
-
-#my $DSN="dbi:Pg:dbname=zclass;host=localhost";
-#my $DBUSER="zclass";
-#my $PASS="";
+my $TABLE="test_conf";
 
 if (not $DSN) {
     die "You need to set proper values for \$DSN, \$DBUSER and \$DBPASS\n".
         "environment variables set these  variables to proper values.";
 }
 
-my $conf=new Conf(new Conf::SQL($DSN,$DBUSER,$PASS));
+my $conf=new Conf(new Conf::SQL(DSN => $DSN,DBUSER => $DBUSER,DBPASS => $PASS, TABLE => $TABLE));
 
 $conf->set("test","HI=Yes");
 $conf->set("test1","NO!");
@@ -70,5 +67,26 @@ ok($all==1,"variables: --> all variables are there");
 $conf->set("oesterhol","HI!");
 ok($conf->get("oesterhol") eq "HI!", "initial conf in \$string -> oesterhol=HI!");
 
+### Cleanup
+
+my $dbh=DBI->connect($DSN,$DBUSER,$DBPASS);
+my $driver=lc($dbh->{Driver}->{Name});
+
+if ($driver eq "pg") {
+  $dbh->do("DROP INDEX $TABLE"."_idx");
+  $dbh->do("DROP TABLE $TABLE");
+} elsif ($driver eq "mysql") {
+  $dbh->do("DROP INDEX $TABLE"."_idx ON $TABLE");
+  $dbh->do("DROP TABLE $TABLE");
+} elsif ($driver eq "sqlite") {
+  $dbh->do("DROP INDEX $TABLE"."_idx");
+  $dbh->do("DROP TABLE $TABLE");
+} else { # Hope for the best
+  $self->{"dbh"}->{"PrintError"}=0;
+  $dbh->do("DROP INDEX $TABLE"."_idx");
+  $dbh->do("DROP TABLE $TABLE");
+}
+
+$dbh->disconnect();
 
 
