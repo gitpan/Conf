@@ -1,5 +1,8 @@
 Revision history for Perl extension Conf.
 
+0.04 Removed Conf::SQL from this package and made it a package
+     on it's own.
+
 0.03 Documentation: Conf::SQL was named Conf::SQL - the *file* backend...
 	is now Conf::SQL - the SQL backend...
 
