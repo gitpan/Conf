@@ -150,11 +150,11 @@ return keys %{$self->{"conf"}};
 1;
 __END__
 
-=head1 Name
+=head1 NAME
 
 Conf::File, a file backend for Conf.
 
-=head1 Abstract
+=head1 ABSTRACT
 
 Conf::File is a file backend for Conf. It handles
 files with identifiers that are assigned values.

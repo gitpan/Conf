@@ -88,9 +88,9 @@ return keys %{$self->{"cfg"}};
 1;
 __END__
 
-=head1 Name
+=head1 NAME
 
-Conf::String, a string backend for Conf.
+Conf::String - a string backend for Conf.
 
 =head1 Synopsys
 
@@ -110,7 +110,7 @@ Conf::String, a string backend for Conf.
  print $out $string;
  close $out;
 
-=head1 Abstract
+=head1 ABSTRACT
 
 C<Conf::String> is a backend module for C<Conf>.
 
